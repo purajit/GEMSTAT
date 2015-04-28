@@ -121,10 +121,10 @@ class Motif
 {
     public:
         // constructors
-        Motif() : pwm(), background() {}
-        Motif( const Matrix& _pwm, const vector< double >& _background );
+        Motif() : pwm(), name(), background() {}
+        Motif( const Matrix& _pwm, string _name, const vector< double >& _background );
                                                   // countMatrix in Transfac format
-        Motif( const Matrix& countMatrix, double pseudoCount, const vector< double >& _background );
+        Motif( const Matrix& countMatrix, string _name, double pseudoCount, const vector< double >& _background );
         void copy( const Motif& other ) { pwm = other.pwm; background = other.background; LLRMat = other.LLRMat; maxSite = other.maxSite; maxLLR = other.maxLLR; }
         Motif( const Motif& other ) { copy( other ); }
 
@@ -134,6 +134,7 @@ class Motif
         // access methods
         int length() const { return pwm.nRows(); }
         const Matrix& getPwm() const { return pwm; }
+        const string& getName() const { return name; }
         const vector< double >& getBackground() const { return background; }
         const Matrix& getLLRMat() const { return LLRMat; }
         const Sequence& getMaxSite() const { return maxSite; }
@@ -156,6 +157,7 @@ class Motif
         friend ostream& operator<<( ostream& os, const Motif& motif );
     private:
         Matrix pwm;                               // the position weight matrix: f_i(b), the frequency of b at position i
+        string name;
         vector< double > background;              // background distribution
         Matrix LLRMat;                            // LLR matrix, M(i,b) = log( f_i(b) / p(b) ), where f_i(b) is the frequency of b at position i of PWM, and p(b) the frequency of b at the background
         Sequence maxSite;                         // the sequence of the strongest site

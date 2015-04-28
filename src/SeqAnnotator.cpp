@@ -336,7 +336,7 @@ Matrix compWtmx( const Matrix& countMatrix, double pseudoCount )
 }
 
 
-Motif::Motif( const Matrix& _pwm, const vector< double >& _background ) : pwm( _pwm ), background( _background ), LLRMat( pwm.nRows(), 4 )
+Motif::Motif( const Matrix& _pwm, string _name, const vector< double >& _background ) : pwm( _pwm ), name(_name), background( _background ), LLRMat( pwm.nRows(), 4 )
 {
     assert( background.size() == 4 );
 
@@ -344,7 +344,7 @@ Motif::Motif( const Matrix& _pwm, const vector< double >& _background ) : pwm( _
 }
 
 
-Motif::Motif( const Matrix& countMatrix, double pseudoCount, const vector< double >& _background ) : background( _background ), LLRMat( countMatrix.nRows(), 4 )
+Motif::Motif( const Matrix& countMatrix, string _name, double pseudoCount, const vector< double >& _background ) : name(_name), background( _background ), LLRMat( countMatrix.nRows(), 4 )
 {
     assert( background.size() == 4 );
 
@@ -396,27 +396,15 @@ void Motif::sample( const gsl_rng* rng, Sequence& elem, bool strand ) const
 }
 
 
-int Motif::load( const string& file, const vector< double >& background, string& name )
+int Motif::load( const string& file, const vector< double >& background)
 {
     vector< Motif > motifs;
-    vector< string > names;
-    int rval = readMotifs( file, background, motifs, names );
+    int rval = readMotifs( file, background, motifs );
     if ( rval == RET_ERROR ) return RET_ERROR;
 
     copy( motifs[ 0 ] );
-    name = names[ 0 ];
     return rval;
 }
-
-
-int Motif::load( const string& file, const vector< double >& background )
-{
-    string name;
-    int rval = load( file, background, name );
-
-    return rval;
-}
-
 
 ostream& operator<<( ostream& os, const Motif& motif )
 {
@@ -456,13 +444,12 @@ void Motif::init()
 }
 
 
-int readMotifs( const string& file, const vector< double >& background, vector< Motif >& motifs, vector< string >& names )
+int readMotifs( const string& file, const vector< double >& background, vector< Motif >& motifs)
 {
     // 	open the file
     ifstream fin( file.c_str() );
     if ( !fin ) { cerr << "Cannot open" << file << endl; return RET_ERROR; }
     motifs.clear();
-    names.clear();
 
     string line;
 
@@ -499,20 +486,11 @@ int readMotifs( const string& file, const vector< double >& background, vector< 
         }
 
         // create the motif
-        names.push_back( string( name ) );
-        motifs.push_back( Motif( countMat, pseudoCount, background ) );
+        motifs.push_back( Motif( countMat, string(name), pseudoCount, background ) );
     } while ( !fin.eof() );
 
     return 0;
 }
-
-
-int readMotifs( const string& file, const vector< double >& background, vector< Motif >& motifs )
-{
-    vector< string > names;
-    return readMotifs( file, background, motifs, names );
-}
-
 
 ostream& operator<<( ostream& os, const Site& site )
 {

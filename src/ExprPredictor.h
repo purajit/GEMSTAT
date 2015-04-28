@@ -146,7 +146,7 @@ class ExprPar
         void getFreePars( vector< double >& pars, const IntMatrix& coopMat, const vector< bool >& actIndicators, const vector< bool >& repIndicators ) const;
 
         // print the parameters
-        void print( ostream& os, const vector< string >& motifNames, const IntMatrix& coopMat ) const;
+        void print( ostream& os, const vector< Motif >& motifs, const IntMatrix& coopMat ) const;
 
         // load the parameter values from a file, assuming the parameter has the correct dimensions (and initialized)
         int load( const string& file, const int num_of_coop_pairs );
@@ -290,7 +290,7 @@ class ExprPredictor
 {
     public:
         // constructors
-        ExprPredictor( const vector < Sequence >& _seqs, const vector< SiteVec >& _seqSites, const vector< SiteVec >& _r_seqSites, const vector< int >& _seqLengths, const vector <int>& _r_seqLengths, const Matrix& _exprData, const vector< Motif >& _motifs, const Matrix& _factorExprData, const FactorIntFunc* _intFunc, const IntMatrix& _coopMat, const vector< bool >& _actIndicators, int _maxContact, const vector< bool >& _repIndicators, const IntMatrix& _repressionMat, double _repressionDistThr, const vector < bool >& _indicator_bool, const vector <string>& _motifNames, const vector < int >& _axis_start, const vector < int >& _axis_end, const vector < double >& _axis_wts  );
+        ExprPredictor( const vector < Sequence >& _seqs, const vector< SiteVec >& _seqSites, const vector< SiteVec >& _r_seqSites, const vector< int >& _seqLengths, const vector <int>& _r_seqLengths, const Matrix& _exprData, const vector< Motif >& _motifs, const Matrix& _factorExprData, const FactorIntFunc* _intFunc, const IntMatrix& _coopMat, const vector< bool >& _actIndicators, int _maxContact, const vector< bool >& _repIndicators, const IntMatrix& _repressionMat, double _repressionDistThr, const vector < bool >& _indicator_bool, const vector < int >& _axis_start, const vector < int >& _axis_end, const vector < double >& _axis_wts  );
 
         // access methods
         int nSeqs() const
@@ -361,7 +361,7 @@ class ExprPredictor
         static int nGradientIters;                // maximum number of iterations for Gradient optimizer
         static bool one_qbtm_per_crm;
         vector < bool > indicator_bool;
-        vector <string> motifNames;
+
         vector < double > fix_pars;
         vector < double > free_pars;
         vector < Sequence > seqs;

@@ -42,7 +42,7 @@ int main( int argc, char* argv[] )
     bool read_factor_thresh = false;
     double eTF = 0.60;
     unsigned long initialSeed = time(0);
-    
+
     string free_fix_indicator_filename;
     ExprPredictor::one_qbtm_per_crm = false;
     ExprPar::one_qbtm_per_crm = false;
@@ -171,17 +171,17 @@ int main( int argc, char* argv[] )
 
     // read the motifs
     vector< Motif > motifs;
-    vector< string > motifNames;
+
     vector< double > background = createNtDistr( gcContent );
-    rval = readMotifs( motifFile, background, motifs, motifNames );
+    rval = readMotifs( motifFile, background, motifs );
     ASSERT_MESSAGE( rval != RET_ERROR , "Could not read the motifs.");
     int nFactors = motifs.size();
 
     // factor name to index mapping
     map< string, int > factorIdxMap;
-    for ( int i = 0; i < motifNames.size(); i++ )
+    for ( int i = 0; i < nFactors; i++ )
     {
-        factorIdxMap[motifNames[i]] = i;
+        factorIdxMap[motifs[i].getName()] = i;
     }
 
     // read the factor expression data
@@ -192,13 +192,13 @@ int main( int argc, char* argv[] )
     cout << labels.size() << " " << nFactors << " " << condNames.size() << " " << nConds << endl;
     ASSERT_MESSAGE( labels.size() == nFactors, "Number of labels and number of transcriptions factors differ.");
     ASSERT_MESSAGE( condNames.size() == nConds, "Number of condition-names and number of conditions differ.");
-    for ( int i = 0; i < nFactors; i++ ){ ASSERT_MESSAGE( labels[i] == motifNames[i], "A label and a motif name disagree in the factor expression file." ); }
+    for ( int i = 0; i < nFactors; i++ ){ ASSERT_MESSAGE( labels[i] == motifs[i].getName(), "A label and a motif name disagree in the factor expression file." ); }
     Matrix factorExprData( data );
     ASSERT_MESSAGE( factorExprData.nCols() == nConds , "Number of columns in factor expression data differs from the number of conditions.");
 
     //initialize the energy threshold factors
     vector < double > energyThrFactors(nFactors, eTF);
-    
+
     if( ! factor_thr_file.empty() )
     {
 	int readFactorRet = readFactorThresholdFile(factor_thr_file, energyThrFactors, nFactors);
@@ -328,7 +328,7 @@ int main( int argc, char* argv[] )
     if ( !factorInfoFile.empty() )
     {
 	int readRet = readFactorRoleFile(factorInfoFile, factorIdxMap, actIndicators, repIndicators);
-        ASSERT_MESSAGE(0 == readRet, "Could not parse the factor information file.");    
+        ASSERT_MESSAGE(0 == readRet, "Could not parse the factor information file.");
     }
 
     // read the repression matrix
@@ -397,15 +397,15 @@ int main( int argc, char* argv[] )
     }
     //Make sure that parameters use the energy thresholds that were specified at either the command-line or factor thresh file.
     if( read_factor_thresh ){ par_init.energyThrFactors = energyThrFactors; }
-   
-    //Check AGAIN that the indicator_bool will be the right shape for the parameters that are read. 
+
+    //Check AGAIN that the indicator_bool will be the right shape for the parameters that are read.
     vector < double > all_pars_for_test;
     par_init.getFreePars(all_pars_for_test, coopMat, actIndicators, repIndicators);
     ASSERT_MESSAGE(all_pars_for_test.size() == indicator_bool.size(), "For some reason, the number of entries in free_fix did not match the number of free parameters.\n"
-		  "Remember that whatever model, there are 3 parameters for every transcription factor\n"); 
+		  "Remember that whatever model, there are 3 parameters for every transcription factor\n");
     all_pars_for_test.clear();//Won't be used again.
     //It is possible that the user wants to write out to the same par file, doing this after reading the par file means we won't have overridden it before reading
-    
+
     //Check that we can access and write to the par outfile now, so that we can warn the user before a lot of time was spent on the optimization
     if( !par_out_file.empty() ){
         par_out_stream.open( par_out_file.c_str() );
@@ -419,7 +419,7 @@ int main( int argc, char* argv[] )
     //     for ( int i = 0; i < seqs.size(); i++ ) cout << seqNames[i] << endl << seqs[i] << endl;
     //     cout << "Expression: " << endl << exprData << endl;
     //     cout << "Factor motifs:" << endl;
-    //     for ( int i = 0; i < motifs.size(); i++ ) cout << motifNames[i] << endl << motifs[i] << endl;
+    //     for ( int i = 0; i < motifs.size(); i++ ) cout << motifs[i].getName() << endl << motifs[i] << endl;
     //     cout << "Factor expression:" << endl << factorExprData << endl;
     //     cout << "Cooperativity matrix:" << endl << coopMat << endl;
     //     cout << "Activators:" << endl << actIndicators << endl;
@@ -462,8 +462,8 @@ int main( int argc, char* argv[] )
     {
         cerr << "Interaction Function is invalid " << endl; exit( 1 );
     }
-    ExprPredictor* predictor = new ExprPredictor( seqs, seqSites, r_seqSites, seqLengths, r_seqLengths, exprData, motifs, factorExprData, intFunc, coopMat, actIndicators, maxContact, repIndicators, repressionMat, repressionDistThr, indicator_bool, motifNames, axis_start, axis_end, axis_wts );
-    
+    ExprPredictor* predictor = new ExprPredictor( seqs, seqSites, r_seqSites, seqLengths, r_seqLengths, exprData, motifs, factorExprData, intFunc, coopMat, actIndicators, maxContact, repIndicators, repressionMat, repressionDistThr, indicator_bool, axis_start, axis_end, axis_wts );
+
     // random number generator
     gsl_rng* rng;
     gsl_rng_env_setup();
@@ -479,16 +479,16 @@ int main( int argc, char* argv[] )
     // print the training results
     ExprPar par = predictor->getPar();
     if( par_out_stream){
-        par.print( par_out_stream, motifNames, coopMat );
+        par.print( par_out_stream, motifs, coopMat );
         par_out_stream.close();
     }
     cout << "Estimated values of parameters:" << endl;
-    par.print( cout, motifNames, coopMat );
+    par.print( cout, motifs, coopMat );
     cout << "Performance = " << setprecision( 5 ) << ( ( ExprPredictor::objOption == SSE || ExprPredictor::objOption == PGP ) ? predictor->getObj() : -predictor->getObj() ) << endl;
 
     // print the predictions
     writePredictions(outFile, *predictor, exprData, expr_condNames, true);
-    
+
     //TODO: R_SEQ Either remove this feature or make it conditional.
     /*
         cout << "Max expressions of the random sequences:" << endl;

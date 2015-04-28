@@ -422,7 +422,7 @@ void ExprPar::getFreePars( vector< double >& pars, const IntMatrix& coopMat, con
 }
 
 
-void ExprPar::print( ostream& os, const vector< string >& motifNames, const IntMatrix& coopMat ) const
+void ExprPar::print( ostream& os, const vector< Motif >& motifs, const IntMatrix& coopMat ) const
 {
 //    os.setf( ios::fixed );
 //    os.precision( 50 );
@@ -430,7 +430,7 @@ void ExprPar::print( ostream& os, const vector< string >& motifNames, const IntM
     // print the factor information
     for ( int i = 0; i < nFactors(); i++ )
     {
-        os << motifNames[i] << "\t" << maxBindingWts[i] << "\t" << txpEffects[i];
+        os << motifs[i].getName() << "\t" << maxBindingWts[i] << "\t" << txpEffects[i];
         if ( modelOption == CHRMOD_UNLIMITED || modelOption == CHRMOD_LIMITED || modelOption == DIRECT ) os << "\t" << repEffects[i];
         os << endl;
     }
@@ -457,7 +457,7 @@ void ExprPar::print( ostream& os, const vector< string >& motifNames, const IntM
     {
         for ( int j = 0; j <= i; j++ )
         {
-            if ( coopMat( i, j ) ) os << motifNames[i] << "\t" << motifNames[j] << "\t" << factorIntMat( i, j ) << endl;
+            if ( coopMat( i, j ) ) os << motifs[i].getName() << "\t" << motifs[j].getName() << "\t" << factorIntMat( i, j ) << endl;
         }
     }
 
@@ -1135,7 +1135,7 @@ bool ExprFunc::testRepression( const Site& a, const Site& b ) const
 }
 
 
-ExprPredictor::ExprPredictor( const vector <Sequence>& _seqs, const vector< SiteVec >& _seqSites, const vector < SiteVec >& _r_seqSites, const vector< int >& _seqLengths, const vector <int>& _r_seqLengths, const Matrix& _exprData, const vector< Motif >& _motifs, const Matrix& _factorExprData, const FactorIntFunc* _intFunc, const IntMatrix& _coopMat, const vector< bool >& _actIndicators, int _maxContact, const vector< bool >& _repIndicators, const IntMatrix& _repressionMat, double _repressionDistThr, const vector < bool >& _indicator_bool, const vector <string>& _motifNames, const vector < int >& _axis_start, const vector < int >& _axis_end, const vector < double >& _axis_wts ) : seqs(_seqs), seqSites( _seqSites ), r_seqSites( _r_seqSites ), seqLengths( _seqLengths ), r_seqLengths( _r_seqLengths ), exprData( _exprData ), motifs( _motifs ), factorExprData( _factorExprData ), intFunc( _intFunc ), coopMat( _coopMat ), actIndicators( _actIndicators ), maxContact( _maxContact ), repIndicators( _repIndicators ), repressionMat( _repressionMat ), repressionDistThr( _repressionDistThr ), indicator_bool ( _indicator_bool ), motifNames ( _motifNames ), axis_start ( _axis_start ), axis_end( _axis_end ), axis_wts( _axis_wts )
+ExprPredictor::ExprPredictor( const vector <Sequence>& _seqs, const vector< SiteVec >& _seqSites, const vector < SiteVec >& _r_seqSites, const vector< int >& _seqLengths, const vector <int>& _r_seqLengths, const Matrix& _exprData, const vector< Motif >& _motifs, const Matrix& _factorExprData, const FactorIntFunc* _intFunc, const IntMatrix& _coopMat, const vector< bool >& _actIndicators, int _maxContact, const vector< bool >& _repIndicators, const IntMatrix& _repressionMat, double _repressionDistThr, const vector < bool >& _indicator_bool, const vector < int >& _axis_start, const vector < int >& _axis_end, const vector < double >& _axis_wts ) : seqs(_seqs), seqSites( _seqSites ), r_seqSites( _r_seqSites ), seqLengths( _seqLengths ), r_seqLengths( _r_seqLengths ), exprData( _exprData ), motifs( _motifs ), factorExprData( _factorExprData ), intFunc( _intFunc ), coopMat( _coopMat ), actIndicators( _actIndicators ), maxContact( _maxContact ), repIndicators( _repIndicators ), repressionMat( _repressionMat ), repressionDistThr( _repressionDistThr ), indicator_bool ( _indicator_bool ), axis_start ( _axis_start ), axis_end( _axis_end ), axis_wts( _axis_wts )
 {
     assert( exprData.nRows() == nSeqs() );
     assert( factorExprData.nRows() == nFactors() && factorExprData.nCols() == nConds() );

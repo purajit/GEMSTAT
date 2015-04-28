@@ -34,7 +34,7 @@ int main( int argc, char* argv[] )
     string dnase_file;
     string factor_thr_file;
     double eTF = 0.60;
-    
+
     for ( int i = 1; i < argc; i++ )
     {
         if ( !strcmp( "-s", argv[ i ] ) )
@@ -53,7 +53,7 @@ int main( int argc, char* argv[] )
             factor_thr_file = argv[ ++i ];
     }
 
-    if ( seqFile.empty() || motifFile.empty() || outFile.empty() ) 
+    if ( seqFile.empty() || motifFile.empty() || outFile.empty() )
     {
         cerr << "Usage: " << argv[ 0 ] << " -s seqFile -m motifFile -fo outFile [ -et default_factor_energy=<" << eTF << "> -ft <factorThresholdsFile -df <dnase_file> ]" << endl;
         exit( 1 );
@@ -63,7 +63,7 @@ int main( int argc, char* argv[] )
 
     // additional control parameters
     double gcContent = 0.5;
-    
+
     // read the sequences
     vector< Sequence > seqs;
     vector< string > seqNames;
@@ -73,22 +73,22 @@ int main( int argc, char* argv[] )
 
     // read the motifs
     vector< Motif > motifs;
-    vector< string > motifNames;
+
     vector< double > background = createNtDistr( gcContent );
-    rval = readMotifs( motifFile, background, motifs, motifNames );
+    rval = readMotifs( motifFile, background, motifs );
     ASSERT_MESSAGE( rval != RET_ERROR , "Could not read the motifs.");
     int nFactors = motifs.size();
 
     // factor name to index mapping
     map< string, int > factorIdxMap;
-    for ( int i = 0; i < motifNames.size(); i++ )
+    for ( int i = 0; i < nFactors; i++ )
     {
-        factorIdxMap[motifNames[i]] = i;
+        factorIdxMap[motifs[i].getName()] = i;
     }
 
     //initialize the energy threshold factors
     vector < double > energyThrFactors(nFactors, eTF);
-    
+
     if( ! factor_thr_file.empty() )
     {
 	int readFactorRet = readFactorThresholdFile(factor_thr_file, energyThrFactors, nFactors);
@@ -185,7 +185,7 @@ int main( int argc, char* argv[] )
     //     for ( int i = 0; i < seqs.size(); i++ ) cout << seqNames[i] << endl << seqs[i] << endl;
     //     cout << "Expression: " << endl << exprData << endl;
     //     cout << "Factor motifs:" << endl;
-    //     for ( int i = 0; i < motifs.size(); i++ ) cout << motifNames[i] << endl << motifs[i] << endl;
+    //     for ( int i = 0; i < motifs.size(); i++ ) cout << motifs[i].getName() << endl << motifs[i] << endl;
     //     cout << "Factor expression:" << endl << factorExprData << endl;
     //     cout << "Cooperativity matrix:" << endl << coopMat << endl;
     //     cout << "Activators:" << endl << actIndicators << endl;
