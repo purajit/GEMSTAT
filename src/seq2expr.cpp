@@ -359,8 +359,8 @@ int main( int argc, char* argv[] )
     int num_indicators = 0;
     num_indicators += nFactors;//The K values for every factor
     num_indicators += num_of_coop_pairs; //For cooperative pairs cooperativities
-    num_indicators += std::accumulate(actIndicators.begin(), actIndicators.end(),(int)0); //All the alpha act
-    num_indicators += std::accumulate(repIndicators.begin(), repIndicators.end(),(int)0); //All the alpha rep
+    num_indicators += vector_sum(actIndicators); //All the alpha act
+    num_indicators += vector_sum(actIndicators); //All the alpha rep
     num_indicators += ExprPredictor::one_qbtm_per_crm ? nSeqs : 1; //for q_btm parameter(s)
     num_indicators += nSeqs; //for the pi parameters
     num_indicators += nSeqs; //for the beta pars per seqs
