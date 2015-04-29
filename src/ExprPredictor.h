@@ -290,7 +290,7 @@ class ExprPredictor
 {
     public:
         // constructors
-        ExprPredictor( const vector < Sequence >& _seqs, const vector< SiteVec >& _seqSites, const vector< SiteVec >& _r_seqSites, const vector< int >& _seqLengths, const vector <int>& _r_seqLengths, const Matrix& _exprData, const vector< Motif >& _motifs, const Matrix& _factorExprData, const FactorIntFunc* _intFunc, const IntMatrix& _coopMat, const vector< bool >& _actIndicators, int _maxContact, const vector< bool >& _repIndicators, const IntMatrix& _repressionMat, double _repressionDistThr, const vector < bool >& _indicator_bool, const vector < int >& _axis_start, const vector < int >& _axis_end, const vector < double >& _axis_wts  );
+        ExprPredictor( const vector < Sequence >& _seqs, const vector< SiteVec >& _seqSites, const vector< SiteVec >& _r_seqSites, const Matrix& _exprData, const vector< Motif >& _motifs, const Matrix& _factorExprData, const FactorIntFunc* _intFunc, const IntMatrix& _coopMat, const vector< bool >& _actIndicators, int _maxContact, const vector< bool >& _repIndicators, const IntMatrix& _repressionMat, double _repressionDistThr, const vector < bool >& _indicator_bool, const vector < int >& _axis_start, const vector < int >& _axis_end, const vector < double >& _axis_wts  );
 
         // access methods
         int nSeqs() const
@@ -368,10 +368,9 @@ class ExprPredictor
     private:
         // training data
         const vector< SiteVec >& seqSites;        // the extracted sites for all sequences
-        const vector< int >& seqLengths;          // lengths of all sequences
+
         //TODO: R_SEQ Either remove this dead feature or revive it and make it conditional.
         const vector <SiteVec>& r_seqSites;
-        const vector< int >& r_seqLengths;        // lengths of all sequences
         const Matrix& exprData;                   // expressions of the corresponding sequences across multiple conditions
         const vector< Motif >& motifs;            // TF binding motifs
         const Matrix& factorExprData;             // [TF] of all factors over multiple conditions

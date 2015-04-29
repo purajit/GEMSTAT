@@ -97,7 +97,6 @@ int main( int argc, char* argv[] )
 
     // site representation of the sequences
     vector< SiteVec > seqSites( nSeqs );
-    vector< int > seqLengths( nSeqs );
     SeqAnnotator ann( motifs, energyThrFactors );
     if ( annFile.empty() )                        // construct site representation
     {
@@ -108,7 +107,6 @@ int main( int argc, char* argv[] )
             {
                 //cout << "Annotated sites for CRM: " << seqNames[i] << endl;
                 ann.annot( seqs[ i ], seqSites[ i ] );
-                seqLengths[i] = seqs[i].size();
             }
         }
         else
@@ -165,7 +163,6 @@ int main( int argc, char* argv[] )
 
                 dnase_input.close();
                 ann.annot( seqs[ i ], seqSites[ i ], dnase_start, dnase_end, scores, temp_start );
-                seqLengths[i] = seqs[i].size();
             }
         }
     }                                             // read the site representation and compute the energy of sites
@@ -176,7 +173,6 @@ int main( int argc, char* argv[] )
         for ( int i = 0; i < nSeqs; i++ )
         {
             ann.compEnergy( seqs[i], seqSites[i] );
-            seqLengths[i] = seqs[i].size();
         }
     }
 

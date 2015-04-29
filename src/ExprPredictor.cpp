@@ -1135,7 +1135,7 @@ bool ExprFunc::testRepression( const Site& a, const Site& b ) const
 }
 
 
-ExprPredictor::ExprPredictor( const vector <Sequence>& _seqs, const vector< SiteVec >& _seqSites, const vector < SiteVec >& _r_seqSites, const vector< int >& _seqLengths, const vector <int>& _r_seqLengths, const Matrix& _exprData, const vector< Motif >& _motifs, const Matrix& _factorExprData, const FactorIntFunc* _intFunc, const IntMatrix& _coopMat, const vector< bool >& _actIndicators, int _maxContact, const vector< bool >& _repIndicators, const IntMatrix& _repressionMat, double _repressionDistThr, const vector < bool >& _indicator_bool, const vector < int >& _axis_start, const vector < int >& _axis_end, const vector < double >& _axis_wts ) : seqs(_seqs), seqSites( _seqSites ), r_seqSites( _r_seqSites ), seqLengths( _seqLengths ), r_seqLengths( _r_seqLengths ), exprData( _exprData ), motifs( _motifs ), factorExprData( _factorExprData ), intFunc( _intFunc ), coopMat( _coopMat ), actIndicators( _actIndicators ), maxContact( _maxContact ), repIndicators( _repIndicators ), repressionMat( _repressionMat ), repressionDistThr( _repressionDistThr ), indicator_bool ( _indicator_bool ), axis_start ( _axis_start ), axis_end( _axis_end ), axis_wts( _axis_wts )
+ExprPredictor::ExprPredictor( const vector <Sequence>& _seqs, const vector< SiteVec >& _seqSites, const vector < SiteVec >& _r_seqSites, const Matrix& _exprData, const vector< Motif >& _motifs, const Matrix& _factorExprData, const FactorIntFunc* _intFunc, const IntMatrix& _coopMat, const vector< bool >& _actIndicators, int _maxContact, const vector< bool >& _repIndicators, const IntMatrix& _repressionMat, double _repressionDistThr, const vector < bool >& _indicator_bool, const vector < int >& _axis_start, const vector < int >& _axis_end, const vector < double >& _axis_wts ) : seqs(_seqs), seqSites( _seqSites ), r_seqSites( _r_seqSites ), exprData( _exprData ), motifs( _motifs ), factorExprData( _factorExprData ), intFunc( _intFunc ), coopMat( _coopMat ), actIndicators( _actIndicators ), maxContact( _maxContact ), repIndicators( _repIndicators ), repressionMat( _repressionMat ), repressionDistThr( _repressionDistThr ), indicator_bool ( _indicator_bool ), axis_start ( _axis_start ), axis_end( _axis_end ), axis_wts( _axis_wts )
 {
     assert( exprData.nRows() == nSeqs() );
     assert( factorExprData.nRows() == nFactors() && factorExprData.nCols() == nConds() );
@@ -1644,11 +1644,10 @@ double ExprPredictor::compRMSE( const ExprPar& par )
 {
     ExprFunc* func = createExprFunc( par );
     vector< SiteVec > seqSites( seqs.size() );
-    vector< int > seqLengths( seqs.size() );
+
     SeqAnnotator ann( motifs, par.energyThrFactors );
     for ( int i = 0; i < seqs.size(); i++ ) {
        	ann.annot( seqs[ i ], seqSites[ i ] );
-    	seqLengths[i] = seqs[i].size();
     }
     // error of each sequence
     double squaredErr = 0;
@@ -1658,7 +1657,7 @@ double ExprPredictor::compRMSE( const ExprPar& par )
         for ( int j = 0; j < nConds(); j++ ) {
 		double predicted = -1;
             	vector< double > concs = factorExprData.getCol( j );
-            	predicted = func->predictExpr( seqSites[ i ], seqLengths[i], concs, i );
+            	predicted = func->predictExpr( seqSites[ i ], seqs[i].size(), concs, i );
 
 
             // predicted expression for the i-th sequence at the j-th condition
@@ -1689,7 +1688,7 @@ double ExprPredictor::compRMSE( const ExprPar& par )
         for ( int j = 0; j < nConds(); j++ ) {
 		//cout << "inside for cond: " << j + 1 << endl;
             	vector< double > concs = factorExprData.getCol( i * nConds() +  j );
-            	double predicted = func->predictExpr( r_seqSites[ i ], r_seqLengths[i], concs, i );
+            	double predicted = func->predictExpr( r_seqSites[ i ], r_seqs[i].size(), concs, i );
 		if( predicted > max ){
 			max = predicted;
 		}
@@ -1712,12 +1711,11 @@ double ExprPredictor::compAvgCorr( const ExprPar& par )
     // create the expression function
     ExprFunc* func = createExprFunc( par );
     vector< SiteVec > seqSites( seqs.size() );
-    vector< int > seqLengths( seqs.size() );
+
     SeqAnnotator ann( motifs, par.energyThrFactors );
     for ( int i = 0; i < seqs.size(); i++ )
     {
         ann.annot( seqs[ i ], seqSites[ i ] );
-        seqLengths[i] = seqs[i].size();
     }
 
     // Pearson correlation of each sequence
@@ -1730,7 +1728,7 @@ double ExprPredictor::compAvgCorr( const ExprPar& par )
         {
             double predicted = -1;
             vector< double > concs = factorExprData.getCol( j );
-            predicted = func->predictExpr( seqSites[ i ], seqLengths[ i ], concs, i );
+            predicted = func->predictExpr( seqSites[ i ], seqs[i].size(), concs, i );
 
             if( predicted != predicted )
             {
@@ -1761,12 +1759,10 @@ double ExprPredictor::compPGP( const ExprPar& par )
     cout << "end samee debug" << endl;	*/
     ExprFunc* func = createExprFunc( par );
     vector< SiteVec > seqSites( seqs.size() );
-    vector< int > seqLengths( seqs.size() );
     SeqAnnotator ann( motifs, par.energyThrFactors );
     for ( int i = 0; i < seqs.size(); i++ )
     {
         ann.annot( seqs[ i ], seqSites[ i ] );
-        seqLengths[i] = seqs[i].size();
     }
     // PGP of each sequence
     double totalSim = 0;
@@ -1778,7 +1774,7 @@ double ExprPredictor::compPGP( const ExprPar& par )
         {
             double predicted = -1;
             vector< double > concs = factorExprData.getCol( j );
-            predicted = func->predictExpr( seqSites[ i ], seqLengths[ i ], concs, i );
+            predicted = func->predictExpr( seqSites[ i ], seqs[i].size(), concs, i );
 
             if( predicted != predicted )
             {
@@ -1817,7 +1813,7 @@ double ExprPredictor::compAvgCrossCorr( const ExprPar& par )
         {
             double predicted = -1;
             vector< double > concs = factorExprData.getCol( j );
-            predicted = func->predictExpr( seqSites[ i ], seqLengths[i], concs, i );
+            predicted = func->predictExpr( seqSites[ i ], seqs[i].size(), concs, i );
 
             // predicted expression for the i-th sequence at the j-th condition
             predictedExprs.push_back( predicted );

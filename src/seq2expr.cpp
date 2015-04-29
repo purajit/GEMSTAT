@@ -210,7 +210,7 @@ int main( int argc, char* argv[] )
     // TODO: Should this code be removed? If we are using this code, and no command-line option was provided for energyThrFactors, but a .par file was provided, shouldn't it use the thresholds learned there? (So, shouldn't it happen after reading the par file?)
     // TODO: Relates to issue #19
     vector< SiteVec > seqSites( nSeqs );
-    vector< int > seqLengths( nSeqs );
+
     SeqAnnotator ann( motifs, energyThrFactors );
     if ( annFile.empty() )                        // construct site representation
     {
@@ -221,7 +221,6 @@ int main( int argc, char* argv[] )
             {
                 //cout << "Annotated sites for CRM: " << seqNames[i] << endl;
                 ann.annot( seqs[ i ], seqSites[ i ] );
-                seqLengths[i] = seqs[i].size();
             }
         }
         else
@@ -278,7 +277,6 @@ int main( int argc, char* argv[] )
 
                 dnase_input.close();
                 ann.annot( seqs[ i ], seqSites[ i ], dnase_start, dnase_end, scores, temp_start );
-                seqLengths[i] = seqs[i].size();
             }
         }
     }                                             // read the site representation and compute the energy of sites
@@ -289,21 +287,18 @@ int main( int argc, char* argv[] )
         for ( int i = 0; i < nSeqs; i++ )
         {
             ann.compEnergy( seqs[i], seqSites[i] );
-            seqLengths[i] = seqs[i].size();
         }
     }
 
     //TODO: R_SEQ Either remove this feature or un-comment it.
     //site representation of the random sequences
     vector< SiteVec > r_seqSites( r_nSeqs );
-    vector< int > r_seqLengths( r_nSeqs );
 
     if( r_seqs.size() > 0){
     /*SeqAnnotator r_ann( motifs, energyThrFactors );
         for ( int i = 0; i < r_nSeqs; i++ ) {
         //cout << "Annotated sites for CRM: " << seqNames[i] << endl;
                 r_ann.annot( r_seqs[ i ], r_seqSites[ i ] );
-                r_seqLengths[i] = r_seqs[i].size();
         }
     */
     }
@@ -462,7 +457,7 @@ int main( int argc, char* argv[] )
     {
         cerr << "Interaction Function is invalid " << endl; exit( 1 );
     }
-    ExprPredictor* predictor = new ExprPredictor( seqs, seqSites, r_seqSites, seqLengths, r_seqLengths, exprData, motifs, factorExprData, intFunc, coopMat, actIndicators, maxContact, repIndicators, repressionMat, repressionDistThr, indicator_bool, axis_start, axis_end, axis_wts );
+    ExprPredictor* predictor = new ExprPredictor( seqs, seqSites, r_seqSites, exprData, motifs, factorExprData, intFunc, coopMat, actIndicators, maxContact, repIndicators, repressionMat, repressionDistThr, indicator_bool, axis_start, axis_end, axis_wts );
 
     // random number generator
     gsl_rng* rng;
@@ -495,7 +490,7 @@ int main( int argc, char* argv[] )
 
         for( int i = 0; i < nSeqs; i++ ){
             vector < double > targetExprs;
-        predictor -> predict(r_seqSites[i], r_seqLengths[i], targetExprs, i);
+        predictor -> predict(r_seqSites[i], r_seqs[i].size(), targetExprs, i);
         double max = 0;
         for( int j = 0; j < targetExprs.size(); j++ ){
             if( targetExprs[ j ] > max  ){
